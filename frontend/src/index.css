@@ -2,34 +2,48 @@
 
 @layer base {
   :root {
-    --canvas-base: #0B0F1A;
-    --surface-card: #121826;
-    --surface-overlay: #161F33;
-    --surface-popover: #1E293B;
-    --border-stroke: #1F2937;
-    --border-stroke-focus: #374151;
+    --canvas-base: #F1F5F9;
+    --canvas-radial: 
+      radial-gradient(ellipse 80% 55% at 15% -8%, rgba(2, 132, 199, 0.14) 0%, transparent 65%),
+      radial-gradient(ellipse 70% 50% at 85% 8%, rgba(16, 185, 129, 0.11) 0%, transparent 60%),
+      radial-gradient(ellipse 75% 60% at 50% 90%, rgba(139, 92, 246, 0.08) 0%, transparent 65%),
+      radial-gradient(ellipse 65% 45% at 80% 85%, rgba(2, 132, 199, 0.09) 0%, transparent 55%),
+      #F1F5F9;
+    --surface-card: #FFFFFF;
+    --surface-card-subtle: #F8FAFC;
+    --surface-card-elevated: #FFFFFF;
+    --surface-overlay: #FFFFFF;
+    --surface-popover: #FFFFFF;
     
-    --primary-blue: #3B82F6;
-    --primary-blue-glow: rgba(59, 130, 246, 0.25);
+    --border-subtle: #E2E8F0;
+    --border-stroke: #E2E8F0;
+    --border-stroke-focus: #0284C7;
     
-    --positive-green: #22C55E;
-    --positive-green-glow: rgba(34, 197, 94, 0.25);
-    --positive-depth: rgba(34, 197, 94, 0.08);
+    --primary-cyan: #0284C7;
+    --primary-cyan-glow: rgba(2, 132, 199, 0.2);
     
-    --negative-red: #EF4444;
-    --negative-red-glow: rgba(239, 68, 68, 0.25);
-    --negative-depth: rgba(239, 68, 68, 0.08);
+    --bullish-mint: #10B981;
+    --bullish-mint-glow: rgba(16, 185, 129, 0.2);
+    --bullish-depth: rgba(16, 185, 129, 0.08);
     
-    --warning-amber: #F59E0B;
-    --text-main: #dde2f6;
-    --text-muted: #9CA3AF;
-    --text-subtle: #6B7280;
+    --bearish-crimson: #F43F5E;
+    --bearish-crimson-glow: rgba(244, 63, 94, 0.2);
+    --bearish-depth: rgba(244, 63, 94, 0.08);
+    
+    --flow-purple: #8B5CF6;
+    --flow-purple-glow: rgba(139, 92, 246, 0.2);
+    
+    --warning-amber: #D97706;
+    --text-main: #0F172A;
+    --text-muted: #475569;
+    --text-subtle: #64748B;
   }
 
   body {
     background-color: var(--canvas-base);
+    background-image: var(--canvas-radial);
     color: var(--text-main);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
     margin: 0;
@@ -37,9 +51,9 @@
   }
 }
 
-/* Typography Hierarchy according to DESIGN.md */
+/* Typography Hierarchy */
 .font-sans {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
 }
 
 .font-mono, .num-font {
@@ -49,51 +63,51 @@
 }
 
 .headline-xl {
-  font-family: 'Inter', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 44px;
-  letter-spacing: -0.02em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 40px;
+  letter-spacing: -0.025em;
 }
 
 .headline-lg {
-  font-family: 'Inter', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 32px;
-  letter-spacing: -0.015em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: -0.02em;
 }
 
 .headline-md {
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 28px;
-  letter-spacing: -0.01em;
+  line-height: 26px;
+  letter-spacing: -0.015em;
 }
 
 .financial-xl {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 36px;
-  letter-spacing: -0.02em;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 34px;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
 }
 
 .financial-lg {
   font-family: 'JetBrains Mono', monospace;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 24px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums;
 }
 
 .financial-md {
   font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 20px;
   font-variant-numeric: tabular-nums;
 }
@@ -101,63 +115,60 @@
 .financial-sm {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  font-weight: 400;
-  line-height: 14px;
+  font-weight: 500;
+  line-height: 15px;
   font-variant-numeric: tabular-nums;
 }
 
 .label-caps {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 14px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-/* Elevation Stack according to DESIGN.md */
-/* Level 0: Canvas Base (#0B0F1A) */
-.bg-canvas {
-  background-color: #0B0F1A;
-}
-
-/* Level 1: Structural Cards / Panels (#121826 with 1px border #1F2937) */
-.glass-panel, .card-level-1 {
-  background-color: #121826;
-  border: 1px solid #1F2937;
-  border-radius: 0.75rem;
-}
-
-.glass-panel-hover {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-panel-hover:hover {
-  border-color: #374151;
-  background-color: #151b2c;
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
-}
-
-/* Level 2: Modals, Overlays, Dropdowns (#161F33 with 1px border #374151 and shadow) */
-.card-level-2, .overlay-panel {
-  background-color: #161F33;
-  border: 1px solid #374151;
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.60);
+/* Portfolix Bright Surfaces & Cards */
+.glass-panel, .card-level-1, .glass-prometheus {
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 8px 24px -4px rgba(2, 132, 199, 0.04);
   border-radius: 1rem;
 }
 
-/* Level 3: Tooltips and micro popovers (#1E293B with border #4B5563) */
+.glass-panel-hover, .glass-prometheus-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-hover:hover, .glass-prometheus-hover:hover {
+  border-color: #BAE6FD;
+  background-color: #FFFFFF;
+  box-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+}
+
+.card-level-2, .overlay-panel, .glass-prometheus-elevated {
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 25px 40px -10px rgba(15, 23, 42, 0.12), 0 10px 20px -5px rgba(2, 132, 199, 0.08);
+  border-radius: 1.25rem;
+}
+
 .card-level-3, .tooltip-panel {
-  background-color: #1E293B;
-  border: 1px solid #4B5563;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   border-radius: 0.5rem;
 }
 
-/* Financial Pill Segmented Controls */
+/* Bright Pill Segmented Controls */
 .pill-track {
-  background-color: #0B0F1A;
-  border: 1px solid #1F2937;
+  background-color: #F1F5F9;
+  border: 1px solid #E2E8F0;
   padding: 3px;
   border-radius: 9999px;
   display: inline-flex;
@@ -166,12 +177,12 @@
 }
 
 .pill-item {
-  padding: 4px 12px;
+  padding: 4px 14px;
   border-radius: 9999px;
   font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
-  font-weight: 500;
-  color: #9CA3AF;
+  font-weight: 600;
+  color: #64748B;
   transition: all 0.15s ease;
   cursor: pointer;
   border: none;
@@ -179,29 +190,30 @@
 }
 
 .pill-item:hover {
-  color: #dde2f6;
+  color: #0F172A;
 }
 
 .pill-item-active {
-  background-color: #1E293B;
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  border-bottom: 2px solid #3B82F6;
+  background-color: #FFFFFF;
+  color: #0284C7;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E2E8F0;
 }
 
 /* Execution Button Styles */
 .btn-buy-primary {
-  background-color: #22C55E;
-  color: #0B0F1A;
-  font-weight: 800;
-  border-radius: 0.5rem;
-  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 0.625rem;
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 }
 
 .btn-buy-primary:hover {
-  background-color: #16a34a;
-  box-shadow: 0 0 16px rgba(34, 197, 94, 0.3);
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
 }
 
 .btn-buy-primary:active {
@@ -209,100 +221,126 @@
 }
 
 .btn-sell-primary {
-  background-color: #EF4444;
+  background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%);
   color: #FFFFFF;
   font-weight: 700;
-  border-radius: 0.5rem;
-  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 0.625rem;
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.25);
 }
 
 .btn-sell-primary:hover {
-  background-color: #dc2626;
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
 }
 
 .btn-sell-primary:active {
   transform: scale(0.98);
 }
 
-.btn-secondary {
-  background-color: #1F2937;
+.btn-cyan-primary, .btn-brand-primary {
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
   color: #FFFFFF;
-  border-radius: 0.5rem;
-  border: 1px solid #374151;
+  font-weight: 700;
+  border-radius: 0.625rem;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+  transition: all 0.15s ease;
+}
+
+.btn-cyan-primary:hover, .btn-brand-primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+
+.btn-secondary {
+  background-color: #F8FAFC;
+  color: #1E293B;
+  border-radius: 0.625rem;
+  border: 1px solid #E2E8F0;
   transition: all 0.15s ease;
 }
 
 .btn-secondary:hover {
-  background-color: #374151;
-  border-color: #4B5563;
+  background-color: #F1F5F9;
+  border-color: #CBD5E1;
 }
 
-/* Optical Highlights & Real-time Tick Flashes */
-@keyframes tickUpFlash {
+/* Tick Flashes for Light Theme */
+@keyframes tickUpFlashLight {
   0% {
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.45);
-    border-color: #22C55E;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    border-color: #10B981;
   }
   100% {
     box-shadow: none;
-    border-color: #1F2937;
+    border-color: #E2E8F0;
   }
 }
 
-@keyframes tickDownFlash {
+@keyframes tickDownFlashLight {
   0% {
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
-    border-color: #EF4444;
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
+    border-color: #F43F5E;
   }
   100% {
     box-shadow: none;
-    border-color: #1F2937;
+    border-color: #E2E8F0;
   }
 }
 
 .flash-up {
-  animation: tickUpFlash 0.4s ease-out;
+  animation: tickUpFlashLight 0.4s ease-out;
 }
 
 .flash-down {
-  animation: tickDownFlash 0.4s ease-out;
+  animation: tickDownFlashLight 0.4s ease-out;
 }
 
-.glow-green {
-  box-shadow: 0 0 16px rgba(34, 197, 94, 0.25);
+.glow-mint {
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
 }
 
-.glow-red {
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+.glow-crimson {
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.2);
 }
 
-.glow-blue {
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+.glow-cyan {
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.2);
 }
 
-/* Custom Minimal Dark Scrollbar */
+.glow-purple {
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+}
+
+/* Clean Bright Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F1A;
+  background: #F8FAFC;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #94A3B8;
 }
 
 /* Focus Rings */
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 1px #3B82F6;
+  border-color: #0284C7 !important;
+  box-shadow: 0 0 0 1px #0284C7, 0 0 8px rgba(2, 132, 199, 0.15);
+}
+
+/* Grid overlay background effect for light theme matching accents */
+.bg-grid-pattern {
+  background-size: 28px 28px;
+  background-image: 
+    radial-gradient(rgba(2, 132, 199, 0.12) 1.2px, transparent 1.2px);
 }

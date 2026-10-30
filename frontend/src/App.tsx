@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { DisclaimerBanner } from './components/DisclaimerBanner';
-import { Navbar } from './components/Navbar';
+import { Navbar, BgTheme } from './components/Navbar';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { AuthModal } from './components/AuthModal';
 
@@ -32,6 +32,14 @@ export const App: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
+  const [bgTheme, setBgTheme] = useState<BgTheme>(() => {
+    return (localStorage.getItem('portfolix_bg_theme') as BgTheme) || 'sky';
+  });
+
+  const handleSelectBgTheme = (theme: BgTheme) => {
+    setBgTheme(theme);
+    localStorage.setItem('portfolix_bg_theme', theme);
+  };
 
   // Global State
   const [symbols, setSymbols] = useState<SymbolData[]>([]);
@@ -153,27 +161,68 @@ export const App: React.FC = () => {
     }
   };
 
+  const bgStyles = {
+    sky: {
+      bg: 'bg-[#F0F7FD]',
+      glow1: 'from-[#0284C7]/15 to-[#38BDF8]/8',
+      glow2: 'from-[#10B981]/12 to-[#34D399]/6',
+      glow3: 'from-[#8B5CF6]/9 to-[#A855F7]/4',
+      glow4: 'from-[#0284C7]/12 to-[#0EA5E9]/6',
+    },
+    mint: {
+      bg: 'bg-[#F0FDF4]',
+      glow1: 'from-[#10B981]/16 to-[#34D399]/8',
+      glow2: 'from-[#0284C7]/12 to-[#38BDF8]/6',
+      glow3: 'from-[#059669]/10 to-[#10B981]/5',
+      glow4: 'from-[#10B981]/12 to-[#047857]/6',
+    },
+    violet: {
+      bg: 'bg-[#F5F3FF]',
+      glow1: 'from-[#8B5CF6]/16 to-[#C084FC]/8',
+      glow2: 'from-[#0284C7]/12 to-[#38BDF8]/6',
+      glow3: 'from-[#F43F5E]/8 to-[#FB7185]/5',
+      glow4: 'from-[#8B5CF6]/12 to-[#7C3AED]/6',
+    },
+  }[bgTheme];
+
   return (
-    <div className="min-h-screen bg-[#0B0F1A] text-[#dde2f6] flex flex-col selection:bg-[#3B82F6]/30 selection:text-white font-sans">
-      {/* Educational Disclaimer Banner */}
-      <DisclaimerBanner />
+    <div className={`min-h-screen ${bgStyles.bg} text-[#0F172A] flex flex-col selection:bg-[#0284C7]/20 selection:text-[#0284C7] font-sans relative overflow-x-hidden transition-colors duration-500`}>
+      {/* Light Colored Matching Ambient Glows & Dot Grid */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Top-left soft matching glow */}
+        <div className={`absolute -top-32 -left-32 w-[540px] h-[540px] bg-gradient-to-br ${bgStyles.glow1} rounded-full blur-3xl opacity-85 transition-all duration-700`} />
+        {/* Top-right soft matching glow */}
+        <div className={`absolute top-6 -right-24 w-[480px] h-[480px] bg-gradient-to-bl ${bgStyles.glow2} rounded-full blur-3xl opacity-80 transition-all duration-700`} />
+        {/* Mid-screen ambient glow */}
+        <div className={`absolute top-1/2 left-1/3 -translate-x-1/2 w-[620px] h-[450px] bg-gradient-to-r ${bgStyles.glow3} rounded-full blur-3xl opacity-75 transition-all duration-700`} />
+        {/* Bottom-right soft glow */}
+        <div className={`absolute -bottom-28 right-8 w-[520px] h-[520px] bg-gradient-to-tl ${bgStyles.glow4} rounded-full blur-3xl opacity-80 transition-all duration-700`} />
+        {/* Subtle Geometric Dot Grid */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-60" />
+      </div>
 
-      {/* Main Navbar */}
-      <Navbar
-        onOpenAuth={() => setIsAuthOpen(true)}
-        symbols={symbols}
-        portfolios={portfolios}
-        activePortfolio={activePortfolio}
-        onSelectPortfolio={handleSelectPortfolio}
-        triggeredAlertsCount={triggeredAlertsCount}
-      />
+      <div className="relative z-10 flex flex-col flex-1">
+        {/* Educational Disclaimer Banner */}
+        <DisclaimerBanner />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Sidebar */}
-        <Sidebar activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)} />
+        {/* Main Navbar */}
+        <Navbar
+          onOpenAuth={() => setIsAuthOpen(true)}
+          symbols={symbols}
+          portfolios={portfolios}
+          activePortfolio={activePortfolio}
+          onSelectPortfolio={handleSelectPortfolio}
+          triggeredAlertsCount={triggeredAlertsCount}
+          bgTheme={bgTheme}
+          onSelectBgTheme={handleSelectBgTheme}
+        />
 
-        {/* Dynamic Main Workspace Area */}
-        <main className="flex-1 p-6 overflow-y-auto max-w-5xl">
+        <div className="flex-1 flex max-w-7xl w-full mx-auto">
+          {/* Sidebar */}
+          <Sidebar activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)} />
+
+          {/* Dynamic Main Workspace Area */}
+          <main className="flex-1 p-6 overflow-y-auto max-w-5xl">
           {activeTab === 'dashboard' && (
             <Dashboard
               portfolio={activePortfolio}
@@ -251,12 +300,13 @@ export const App: React.FC = () => {
         </main>
       </div>
 
-      {/* Persistent Simulation Disclaimer Footer */}
-      <footer aria-label="Simulation Notice" className="w-full bg-[#080E1C] border-t border-[#1F2937] py-2 px-4 text-center">
-        <p className="financial-sm text-[#6B7280]">
-          Educational simulation software. Not investment advice.
-        </p>
-      </footer>
+        {/* Persistent Simulation Disclaimer Footer */}
+        <footer aria-label="Simulation Notice" className="w-full bg-[#FFFFFF]/90 backdrop-blur-md border-t border-[#E2E8F0] py-2 px-4 text-center">
+          <p className="financial-sm text-[#64748B]">
+            PORTFOLIX • QUANTITATIVE TRADING & ANALYTICS TERMINAL • EDUCATIONAL SIMULATION SOFTWARE • NOT INVESTMENT ADVICE
+          </p>
+        </footer>
+      </div>
 
       {/* Authentication Modal */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />

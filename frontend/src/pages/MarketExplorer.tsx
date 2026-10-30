@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import {
   Search,
-  SlidersHorizontal,
   TrendingUp,
   Activity,
   BarChart2,
-  Layers,
-  ArrowRight,
   Sparkles,
   Grid,
 } from 'lucide-react';
 import { MarketChart } from '../components/MarketChart';
+import { StockLogo } from '../components/StockLogo';
 import {
   SymbolData,
   SymbolDetail,
@@ -36,7 +34,7 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
   symbols,
   selectedSymbol,
   onSelectSymbol,
-  symbolDetail,
+  symbolDetail: _symbolDetail,
   prices,
   indicators,
   marketStats,
@@ -59,30 +57,30 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
   return (
     <div className="space-y-6">
       {/* Search & Sector Filter Bar */}
-      <div className="glass-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#121826] border border-[#1F2937] rounded-xl">
+      <div className="glass-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-xs">
         {/* Search */}
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-[#0284C7] absolute left-3.5 top-3" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search 20 NSE equities (e.g. RELIANCE, TCS)..."
-            className="w-full pl-9 pr-4 py-2 bg-[#0B0F1A] border border-[#1F2937] rounded-lg text-xs text-white placeholder-[#6B7280] focus:border-[#3B82F6]"
+            placeholder="Search equities (e.g. RELIANCE, TCS)..."
+            className="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#0284C7]"
           />
         </div>
 
         {/* Sector Pill Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
           {sectors.map((sec) => (
             <button
               key={sec as string}
               type="button"
               onClick={() => setSelectedSector(sec as string)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition font-mono cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition font-mono cursor-pointer ${
                 selectedSector === sec
-                  ? 'bg-[#1E293B] text-white border border-[#3B82F6]/50 shadow-sm shadow-[#3B82F6]/10'
-                  : 'bg-[#0B0F1A] text-[#9CA3AF] hover:text-white border border-[#1F2937]'
+                  ? 'bg-[#E0F2FE] text-[#0284C7] border border-[#BAE6FD] shadow-xs'
+                  : 'bg-[#F8FAFC] text-[#64748B] hover:text-[#0F172A] border border-[#E2E8F0]'
               }`}
             >
               {sec}
@@ -92,7 +90,7 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
       </div>
 
       {/* Stock Selection Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
         {filteredSymbols.map((s) => {
           const isSelected = s.ticker === selectedSymbol;
           const isUp = (s.change_pct_1d || 0) >= 0;
@@ -101,20 +99,23 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
               key={s.ticker}
               type="button"
               onClick={() => onSelectSymbol(s.ticker)}
-              className={`px-3.5 py-2 rounded-xl text-left transition shrink-0 border cursor-pointer ${
+              className={`px-3 py-2 rounded-xl text-left transition shrink-0 border cursor-pointer flex items-center gap-2.5 ${
                 isSelected
-                  ? 'bg-[#1E293B] border-[#3B82F6]/60 text-white shadow-md shadow-[#3B82F6]/10'
-                  : 'bg-[#121826] border-[#1F2937] hover:border-[#3B82F6]/30 text-[#dde2f6]'
+                  ? 'bg-[#E0F2FE] border-[#0284C7] text-[#0F172A] shadow-xs'
+                  : 'bg-[#FFFFFF] border-[#E2E8F0] hover:border-[#CBD5E1] text-[#334155]'
               }`}
             >
-              <div className="flex items-center justify-between gap-3 font-mono">
-                <span className="font-bold text-xs">{s.ticker}</span>
-                <span className={`text-[10px] font-semibold ${isUp ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
-                  {isUp ? '+' : ''}{Number(s.change_pct_1d || 0).toFixed(1)}%
-                </span>
-              </div>
-              <div className="text-[10px] text-[#9CA3AF] font-mono mt-0.5">
-                ₹{Number(s.latest_price || 0).toFixed(2)}
+              <StockLogo ticker={s.ticker} size="sm" />
+              <div>
+                <div className="flex items-center justify-between gap-2.5 font-mono">
+                  <span className="font-bold text-xs">{s.ticker}</span>
+                  <span className={`text-[10px] font-bold ${isUp ? 'text-[#059669]' : 'text-[#E11D48]'}`}>
+                    {isUp ? '+' : ''}{Number(s.change_pct_1d || 0).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="text-[10px] text-[#64748B] font-mono mt-0.5">
+                  ₹{Number(s.latest_price || 0).toFixed(2)}
+                </div>
               </div>
             </button>
           );
@@ -125,17 +126,17 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
       <MarketChart prices={prices} indicators={indicators} ticker={selectedSymbol} />
 
       {/* Action shortcuts */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 glass-panel bg-[#121826] border border-[#1F2937] rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 glass-panel bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-xs">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#9CA3AF] font-sans">
-            Execution telemetry for <strong className="text-white font-mono">{selectedSymbol}</strong>:
+          <span className="text-xs text-[#64748B] font-sans">
+            Direct execution for <strong className="text-[#0F172A] font-mono">{selectedSymbol}</strong>:
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => onNavigateTab('trade')}
-            className="px-4 py-2 rounded-lg bg-[#22C55E] hover:bg-[#16a34a] text-[#0B0F1A] font-extrabold text-xs flex items-center gap-1.5 shadow-md shadow-[#22C55E]/20 transition cursor-pointer active:scale-98"
+            className="btn-buy-primary px-4 py-2 text-xs flex items-center gap-1.5 cursor-pointer active:scale-98 shadow-xs"
           >
             <TrendingUp className="w-3.5 h-3.5" />
             Trade {selectedSymbol}
@@ -143,15 +144,15 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
           <button
             type="button"
             onClick={() => onNavigateTab('backtest')}
-            className="px-4 py-2 rounded-lg bg-[#1F2937] hover:bg-[#374151] border border-[#374151] text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-98"
+            className="btn-secondary px-4 py-2 text-xs flex items-center gap-1.5 cursor-pointer active:scale-98 font-semibold"
           >
-            <BarChart2 className="w-3.5 h-3.5 text-[#3B82F6]" />
+            <BarChart2 className="w-3.5 h-3.5 text-[#0284C7]" />
             Backtest Strategy
           </button>
           <button
             type="button"
             onClick={() => onNavigateTab('forecast')}
-            className="px-4 py-2 rounded-lg bg-[#1F2937] hover:bg-[#374151] border border-[#374151] text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-98"
+            className="btn-secondary px-4 py-2 text-xs flex items-center gap-1.5 cursor-pointer active:scale-98 font-semibold"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6]" />
             ML Forecast
@@ -161,51 +162,51 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
 
       {/* Quantitative Statistics & Metrics Deck */}
       {marketStats && (
-        <div className="glass-panel p-5 bg-[#121826] border border-[#1F2937] rounded-xl">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-4 font-sans">
-            <Activity className="w-4 h-4 text-[#3B82F6]" />
-            Statistical Risk & Factor Profile ({selectedSymbol})
+        <div className="glass-panel p-5 bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-xs">
+          <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 mb-4 font-sans">
+            <Activity className="w-4 h-4 text-[#0284C7]" />
+            Statistical Risk & Quantitative Profile ({selectedSymbol})
           </h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono">
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Annualized Return</div>
-              <div className={`financial-lg font-bold mt-1 ${marketStats.annualized_return >= 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Annualized Return</div>
+              <div className={`financial-lg font-bold mt-1 ${marketStats.annualized_return >= 0 ? 'text-[#059669]' : 'text-[#E11D48]'}`}>
                 {(Number(marketStats.annualized_return) * 100).toFixed(2)}%
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Annual Volatility</div>
-              <div className="financial-lg font-bold text-white mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Annual Volatility</div>
+              <div className="financial-lg font-bold text-[#0F172A] mt-1">
                 {(Number(marketStats.annualized_volatility) * 100).toFixed(2)}%
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Sharpe Ratio</div>
-              <div className="financial-lg font-bold text-[#adc6ff] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Sharpe Ratio</div>
+              <div className="financial-lg font-bold text-[#0284C7] mt-1">
                 {Number(marketStats.sharpe_ratio).toFixed(2)}
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Sortino Ratio</div>
-              <div className="financial-lg font-bold text-[#4ae176] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Sortino Ratio</div>
+              <div className="financial-lg font-bold text-[#059669] mt-1">
                 {Number(marketStats.sortino_ratio).toFixed(2)}
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Beta vs Market</div>
-              <div className="financial-lg font-bold text-[#F59E0B] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Beta vs Market</div>
+              <div className="financial-lg font-bold text-[#D97706] mt-1">
                 {Number(marketStats.beta_vs_benchmark).toFixed(2)}
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Max Drawdown</div>
-              <div className="financial-lg font-bold text-[#EF4444] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Max Drawdown</div>
+              <div className="financial-lg font-bold text-[#E11D48] mt-1">
                 {(Number(marketStats.max_drawdown) * 100).toFixed(2)}%
               </div>
             </div>
@@ -215,24 +216,24 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
 
       {/* Cross-Asset Correlation Heatmap Matrix */}
       {correlationMatrix && correlationMatrix.symbols.length > 0 && (
-        <div className="glass-panel p-5 bg-[#121826] border border-[#1F2937] rounded-xl">
+        <div className="glass-panel p-5 bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2 font-sans">
-                <Grid className="w-4 h-4 text-[#3B82F6]" />
-                Cross-Asset Correlation Matrix
+              <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-sans">
+                <Grid className="w-4 h-4 text-[#0284C7]" />
+                Cross-Asset Correlation Heatmap Matrix
               </h3>
-              <p className="text-xs text-[#9CA3AF] mt-0.5 font-sans">Daily return co-movement across NSE basket</p>
+              <p className="text-xs text-[#64748B] mt-0.5 font-sans">Daily return co-movement across NSE universe</p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1 text-[11px] text-[#9CA3AF]">
-                <span className="w-2.5 h-2.5 bg-[#22C55E] rounded-xs inline-block"></span> High (+1.0)
+              <span className="flex items-center gap-1 text-[11px] text-[#475569]">
+                <span className="w-2.5 h-2.5 bg-[#10B981] rounded-xs inline-block"></span> High (+1.0)
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-[#9CA3AF]">
-                <span className="w-2.5 h-2.5 bg-[#1F2937] rounded-xs inline-block"></span> Zero (0.0)
+              <span className="flex items-center gap-1 text-[11px] text-[#475569]">
+                <span className="w-2.5 h-2.5 bg-[#E2E8F0] rounded-xs inline-block"></span> Neutral (0.0)
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-[#9CA3AF]">
-                <span className="w-2.5 h-2.5 bg-[#EF4444] rounded-xs inline-block"></span> Inverse (-1.0)
+              <span className="flex items-center gap-1 text-[11px] text-[#475569]">
+                <span className="w-2.5 h-2.5 bg-[#F43F5E] rounded-xs inline-block"></span> Inverse (-1.0)
               </span>
             </div>
           </div>
@@ -241,9 +242,9 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
             <table className="w-full text-xs font-mono border-collapse">
               <thead>
                 <tr>
-                  <th className="p-2 text-left font-bold text-[#9CA3AF] border-b border-[#1F2937]"></th>
+                  <th className="p-2.5 text-left font-bold text-[#64748B] border-b border-[#E2E8F0]"></th>
                   {correlationMatrix.symbols.map((sym) => (
-                    <th key={sym} className="p-2 text-center font-bold text-[#dde2f6] border-b border-[#1F2937]">
+                    <th key={sym} className="p-2.5 text-center font-bold text-[#0F172A] border-b border-[#E2E8F0]">
                       {sym}
                     </th>
                   ))}
@@ -251,26 +252,26 @@ export const MarketExplorer: React.FC<MarketExplorerProps> = ({
               </thead>
               <tbody>
                 {correlationMatrix.symbols.map((symRow, rIdx) => (
-                  <tr key={symRow} className="hover:bg-[#161F33]/40">
-                    <td className="p-2 font-bold text-[#dde2f6] border-r border-[#1F2937]">{symRow}</td>
+                  <tr key={symRow} className="hover:bg-[#F8FAFC]">
+                    <td className="p-2.5 font-bold text-[#0F172A] border-r border-[#E2E8F0]">{symRow}</td>
                     {correlationMatrix.matrix[rIdx].map((val, cIdx) => {
-                      let bgColor = 'rgba(18, 24, 38, 0.8)';
-                      let textColor = '#9CA3AF';
+                      let bgColor = '#F8FAFC';
+                      let textColor = '#475569';
                       if (val > 0.6) {
-                        bgColor = `rgba(34, 197, 94, ${Math.min(0.8, val * 0.7)})`;
-                        textColor = '#ffffff';
+                        bgColor = '#DCFCE7';
+                        textColor = '#166534';
                       } else if (val > 0.2) {
-                        bgColor = `rgba(34, 197, 94, ${val * 0.35})`;
-                        textColor = '#dde2f6';
+                        bgColor = '#F0FDF4';
+                        textColor = '#15803D';
                       } else if (val < -0.2) {
-                        bgColor = `rgba(239, 68, 68, ${Math.abs(val) * 0.35})`;
-                        textColor = '#dde2f6';
+                        bgColor = '#FFE4E6';
+                        textColor = '#BE123C';
                       }
                       return (
                         <td
                           key={cIdx}
                           style={{ backgroundColor: bgColor, color: textColor }}
-                          className="p-2 text-center text-[11px] font-semibold transition border border-[#1F2937]/50"
+                          className="p-2.5 text-center text-[11px] font-bold transition border border-[#E2E8F0]"
                         >
                           {Number(val).toFixed(2)}
                         </td>

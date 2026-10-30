@@ -4,28 +4,13 @@ import {
   Shield,
   Activity,
   Plus,
-  ArrowUpRight,
-  ArrowDownRight,
   Sparkles,
   Download,
-  Sliders,
   DollarSign,
-  TrendingUp,
   RefreshCw,
   SlidersHorizontal,
   X,
 } from 'lucide-react';
-import {
-  ResponsiveContainer,
-  ScatterChart,
-  Scatter,
-  XAxis,
-  YAxis,
-  ZAxis,
-  Tooltip,
-  Cell,
-  Line,
-} from 'recharts';
 import api from '../api/client';
 import {
   Portfolio,
@@ -33,6 +18,7 @@ import {
   OptimizationResponse,
   SymbolData,
 } from '../types';
+import { StockLogo } from '../components/StockLogo';
 
 interface PortfoliosProps {
   portfolios: Portfolio[];
@@ -44,7 +30,7 @@ interface PortfoliosProps {
 }
 
 export const Portfolios: React.FC<PortfoliosProps> = ({
-  portfolios,
+  portfolios: _portfolios,
   activePortfolio,
   onSelectPortfolio,
   performance,
@@ -158,22 +144,22 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
   return (
     <div className="space-y-6">
       {/* Portfolio Header & Switcher */}
-      <div className="glass-panel p-5 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#121826] border border-[#1F2937] rounded-xl">
+      <div className="glass-panel p-5 flex flex-col md:flex-row items-center justify-between gap-4 bg-white border border-[#E2E8F0] rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 flex items-center justify-center text-[#3B82F6]">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0284C7]/15 to-[#8B5CF6]/15 border border-[#BAE6FD] flex items-center justify-center text-[#0284C7] shadow-xs">
             <PieIcon className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white tracking-tight font-sans">
+              <h2 className="text-lg font-black text-[#0F172A] tracking-tight font-sans">
                 {activePortfolio?.name || 'Main Alpha Portfolio'}
               </h2>
-              <span className="label-caps px-2 py-0.5 rounded-full bg-[#3B82F6]/15 border border-[#3B82F6]/30 text-[#adc6ff]">
-                MPT ENGINE
+              <span className="label-caps px-2 py-0.5 rounded-full bg-[#E0F2FE] border border-[#BAE6FD] text-[#0284C7] text-[9px] font-bold">
+                PORTFOLIX MPT
               </span>
             </div>
-            <p className="text-xs text-[#9CA3AF] mt-0.5 font-sans">
-              Modern Portfolio Theory & Multi-Asset Markowitz Optimization Suite
+            <p className="text-xs text-[#64748B] mt-0.5 font-sans">
+              Markowitz Mean-Variance Optimization, Quadratic Efficient Frontier & Risk Parity
             </p>
           </div>
         </div>
@@ -185,15 +171,15 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
               setIsDeposit(true);
               setShowCashModal(true);
             }}
-            className="px-3.5 py-1.5 rounded-lg bg-[#1F2937] hover:bg-[#374151] border border-[#374151] text-xs font-semibold text-white flex items-center gap-1.5 transition cursor-pointer active:scale-98"
+            className="btn-secondary px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-98"
           >
-            <DollarSign className="w-3.5 h-3.5 text-[#22C55E]" />
+            <DollarSign className="w-3.5 h-3.5 text-[#10B981]" />
             Cash Transfer
           </button>
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-3.5 py-1.5 rounded-lg bg-[#22C55E] hover:bg-[#16a34a] text-[#0B0F1A] text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-[#22C55E]/20 transition cursor-pointer active:scale-98"
+            className="btn-buy-primary px-3.5 py-2 text-xs flex items-center gap-1.5 cursor-pointer active:scale-98"
           >
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
             New Book
@@ -201,7 +187,7 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
           <button
             type="button"
             onClick={handleExportCSV}
-            className="px-3.5 py-1.5 rounded-lg bg-[#1F2937] hover:bg-[#374151] border border-[#374151] text-[#adc6ff] text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer active:scale-98"
+            className="btn-secondary px-3.5 py-2 text-[#0284C7] text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-98"
           >
             <Download className="w-3.5 h-3.5" />
             Audit CSV
@@ -211,58 +197,58 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
 
       {/* Risk Profile & VaR Matrix */}
       {performance?.risk_metrics && (
-        <div className="glass-panel p-5 bg-[#121826] border border-[#1F2937] rounded-xl">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3 font-sans">
-            <Shield className="w-4 h-4 text-[#3B82F6]" />
+        <div className="glass-panel p-5 bg-white border border-[#E2E8F0] rounded-2xl shadow-sm">
+          <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 mb-3.5 font-sans">
+            <Shield className="w-4 h-4 text-[#0284C7]" />
             Value-at-Risk (VaR / CVaR) & Factor Exposure Deck
           </h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 font-mono">
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Sharpe</div>
-              <div className="financial-lg font-bold text-[#adc6ff] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Sharpe</div>
+              <div className="financial-lg font-bold text-[#0284C7] mt-1">
                 {Number(performance.risk_metrics.sharpe_ratio).toFixed(2)}
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Sortino</div>
-              <div className="financial-lg font-bold text-[#4ae176] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Sortino</div>
+              <div className="financial-lg font-bold text-[#10B981] mt-1">
                 {Number(performance.risk_metrics.sortino_ratio).toFixed(2)}
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Calmar</div>
-              <div className="financial-lg font-bold text-[#3B82F6] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Calmar</div>
+              <div className="financial-lg font-bold text-[#0EA5E9] mt-1">
                 {Number(performance.risk_metrics.calmar_ratio).toFixed(2)}
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Max DD</div>
-              <div className="financial-lg font-bold text-[#EF4444] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Max DD</div>
+              <div className="financial-lg font-bold text-[#F43F5E] mt-1">
                 {Number(performance.risk_metrics.max_drawdown).toFixed(2)}%
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">VaR (95%)</div>
-              <div className="financial-lg font-bold text-[#F59E0B] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">VaR (95%)</div>
+              <div className="financial-lg font-bold text-[#D97706] mt-1">
                 {Number(performance.risk_metrics.var_95_historical).toFixed(2)}%
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">CVaR (95%)</div>
-              <div className="financial-lg font-bold text-[#EF4444] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">CVaR (95%)</div>
+              <div className="financial-lg font-bold text-[#F43F5E] mt-1">
                 {Number(performance.risk_metrics.cvar_95_historical).toFixed(2)}%
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Beta</div>
-              <div className="financial-lg font-bold text-[#dde2f6] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Beta</div>
+              <div className="financial-lg font-bold text-[#0F172A] mt-1">
                 {Number(performance.risk_metrics.beta).toFixed(2)}
               </div>
             </div>
-            <div className="p-3 bg-[#0B0F1A] rounded-lg border border-[#1F2937]">
-              <div className="label-caps text-[#9CA3AF]">Alpha (Ann)</div>
-              <div className="financial-lg font-bold text-[#22C55E] mt-1">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <div className="label-caps text-[#64748B]">Alpha (Ann)</div>
+              <div className="financial-lg font-bold text-[#10B981] mt-1">
                 {Number(performance.risk_metrics.alpha).toFixed(2)}%
               </div>
             </div>
@@ -271,8 +257,8 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
       )}
 
       {/* Holdings Table */}
-      <div className="glass-panel p-5 bg-[#121826] border border-[#1F2937] rounded-xl">
-        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3 font-sans">
+      <div className="glass-panel p-5 bg-white border border-[#E2E8F0] rounded-2xl shadow-sm">
+        <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 mb-3.5 font-sans">
           <PieIcon className="w-4 h-4 text-[#8B5CF6]" />
           Asset Holdings & Valuation Ledger
         </h3>
@@ -280,7 +266,7 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left font-mono">
             <thead>
-              <tr className="text-[#9CA3AF] border-b border-[#1F2937] label-caps">
+              <tr className="text-[#64748B] border-b border-[#E2E8F0] label-caps">
                 <th className="pb-2.5">Asset</th>
                 <th className="pb-2.5">Quantity</th>
                 <th className="pb-2.5">Avg Buy Price</th>
@@ -291,29 +277,34 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                 <th className="pb-2.5 text-right">Portfolio Weight</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1F2937]">
+            <tbody className="divide-y divide-[#E2E8F0]">
               {activePortfolio?.holdings && activePortfolio.holdings.length > 0 ? (
                 activePortfolio.holdings.map((h) => {
                   const isUp = h.unrealized_pnl >= 0;
                   return (
-                    <tr key={h.id} className="hover:bg-[#161F33]/50 h-9 transition">
-                      <td className="py-2.5 font-bold text-white">
-                        {h.ticker}
-                        <span className="block text-[10px] text-[#9CA3AF] font-normal font-sans">{h.name}</span>
+                    <tr key={h.id} className="hover:bg-[#F8FAFC] h-10 transition">
+                      <td className="py-2.5 font-bold text-[#0F172A]">
+                        <div className="flex items-center gap-2">
+                          <StockLogo ticker={h.ticker} size="sm" />
+                          <div>
+                            <span>{h.ticker}</span>
+                            <span className="block text-[10px] text-[#64748B] font-normal font-sans">{h.name}</span>
+                          </div>
+                        </div>
                       </td>
-                      <td className="py-2.5 text-[#dde2f6]">{Number(h.quantity).toFixed(0)}</td>
-                      <td className="py-2.5 text-[#9CA3AF]">₹{Number(h.average_buy_price).toFixed(2)}</td>
-                      <td className="py-2.5 font-semibold text-white">₹{Number(h.current_price).toFixed(2)}</td>
-                      <td className="py-2.5 text-[#dde2f6]">
+                      <td className="py-2.5 text-[#334155]">{Number(h.quantity).toFixed(0)}</td>
+                      <td className="py-2.5 text-[#64748B]">₹{Number(h.average_buy_price).toFixed(2)}</td>
+                      <td className="py-2.5 font-semibold text-[#0F172A]">₹{Number(h.current_price).toFixed(2)}</td>
+                      <td className="py-2.5 text-[#334155]">
                         ₹{Number(h.total_invested).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="py-2.5 font-bold text-white">
+                      <td className="py-2.5 font-bold text-[#0F172A]">
                         ₹{Number(h.market_value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className={`py-2.5 font-bold ${isUp ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
+                      <td className={`py-2.5 font-bold ${isUp ? 'text-[#10B981]' : 'text-[#F43F5E]'}`}>
                         {isUp ? '+' : ''}₹{Number(h.unrealized_pnl).toFixed(2)} ({Number(h.unrealized_pnl_pct || 0).toFixed(2)}%)
                       </td>
-                      <td className="py-2.5 text-right font-bold text-[#dde2f6]">
+                      <td className="py-2.5 text-right font-bold text-[#334155]">
                         {Number(h.weight_pct || 0).toFixed(2)}%
                       </td>
                     </tr>
@@ -321,8 +312,20 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-[#9CA3AF] text-xs font-sans">
-                    No holdings in this book. Place simulated orders in the Trading Terminal!
+                  <td colSpan={8} className="py-10 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <img
+                        src="/images/empty-state.jpg"
+                        alt="No active positions"
+                        className="w-36 h-28 object-cover rounded-xl border border-[#E2E8F0] shadow-xs"
+                      />
+                      <div>
+                        <p className="font-bold text-sm text-[#0F172A] font-sans">No Holdings in this Book</p>
+                        <p className="text-xs text-[#64748B] font-sans mt-0.5">
+                          Route paper trades in the Trading Terminal to build this portfolio.
+                        </p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -332,22 +335,22 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
       </div>
 
       {/* Markowitz Modern Portfolio Theory (MPT) Optimization Suite */}
-      <div className="glass-panel p-6 bg-[#121826] border border-[#1F2937] rounded-xl">
+      <div className="glass-panel p-6 bg-white border border-[#E2E8F0] rounded-2xl shadow-sm">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 font-sans">
-              <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
+            <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-sans">
+              <Sparkles className="w-4 h-4 text-[#0284C7]" />
               Markowitz Mean-Variance Optimization (Efficient Frontier)
             </h3>
-            <p className="text-xs text-[#9CA3AF] mt-0.5 font-sans">
-              Quadratic programming solver for Tangency Portfolio & Risk Parity Weights
+            <p className="text-xs text-[#64748B] mt-0.5 font-sans">
+              Quadratic programming solver for Tangency Portfolio & Equal Risk Contribution
             </p>
           </div>
           <button
             type="button"
             onClick={handleRunOptimization}
             disabled={optLoading}
-            className="px-4 py-2 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white font-bold text-xs shadow-lg shadow-[#3B82F6]/20 flex items-center gap-2 transition cursor-pointer disabled:opacity-50 active:scale-98"
+            className="btn-primary px-4 py-2 text-xs font-bold flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-98"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${optLoading ? 'animate-spin' : ''}`} />
             {optLoading ? 'Solving Frontier...' : 'Run MPT Solver'}
@@ -356,7 +359,7 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
 
         {/* Selected Universe for Optimization */}
         <div className="mb-4 flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-[#9CA3AF] label-caps mr-1">Asset Basket:</span>
+          <span className="text-[#64748B] label-caps mr-1">Asset Universe:</span>
           {symbols.slice(0, 10).map((s) => {
             const isIncluded = optSymbols.includes(s.ticker);
             return (
@@ -370,10 +373,10 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                     setOptSymbols([...optSymbols, s.ticker]);
                   }
                 }}
-                className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold border transition cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-[11px] font-mono font-semibold border transition cursor-pointer ${
                   isIncluded
-                    ? 'bg-[#3B82F6]/15 border-[#3B82F6]/50 text-[#adc6ff]'
-                    : 'bg-[#0B0F1A] border-[#1F2937] text-[#9CA3AF] hover:text-white'
+                    ? 'bg-[#E0F2FE] border-[#BAE6FD] text-[#0284C7] shadow-xs'
+                    : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A]'
                 }`}
               >
                 {s.ticker}
@@ -387,66 +390,66 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
           <div className="space-y-6 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Max Sharpe */}
-              <div className="p-4 bg-[#0B0F1A] rounded-xl border border-[#3B82F6]/40">
-                <div className="flex items-center justify-between text-xs font-bold text-[#adc6ff] mb-2 font-sans">
+              <div className="p-4 bg-[#F8FAFC] rounded-xl border border-[#BAE6FD] shadow-xs">
+                <div className="flex items-center justify-between text-xs font-bold text-[#0284C7] mb-2 font-sans">
                   <span className="label-caps">MAXIMUM SHARPE (TANGENCY)</span>
-                  <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                  <Sparkles className="w-4 h-4 text-[#0284C7]" />
                 </div>
-                <div className="text-xs text-[#9CA3AF] space-y-1 font-mono">
-                  <div>Expected Return: <strong className="text-[#22C55E]">{(Number(optResult.max_sharpe.expected_return) * 100).toFixed(2)}%</strong></div>
-                  <div>Annual Volatility: <strong className="text-white">{(Number(optResult.max_sharpe.volatility) * 100).toFixed(2)}%</strong></div>
-                  <div>Sharpe Ratio: <strong className="text-[#adc6ff]">{Number(optResult.max_sharpe.sharpe_ratio).toFixed(2)}</strong></div>
+                <div className="text-xs text-[#64748B] space-y-1 font-mono">
+                  <div>Expected Return: <strong className="text-[#10B981]">{(Number(optResult.max_sharpe.expected_return) * 100).toFixed(2)}%</strong></div>
+                  <div>Annual Volatility: <strong className="text-[#0F172A]">{(Number(optResult.max_sharpe.volatility) * 100).toFixed(2)}%</strong></div>
+                  <div>Sharpe Ratio: <strong className="text-[#0284C7] font-bold">{Number(optResult.max_sharpe.sharpe_ratio).toFixed(2)}</strong></div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-[#1F2937] space-y-1 text-xs">
-                  <div className="label-caps text-[#9CA3AF]">Optimal Weights:</div>
+                <div className="mt-3 pt-3 border-t border-[#E2E8F0] space-y-1 text-xs">
+                  <div className="label-caps text-[#64748B]">Optimal Weights:</div>
                   {Object.entries(optResult.max_sharpe.weights).map(([s, w]) => (
                     <div key={s} className="flex justify-between text-[11px] font-mono">
-                      <span className="text-[#dde2f6]">{s}:</span>
-                      <span className="font-bold text-[#22C55E]">{(Number(w) * 100).toFixed(1)}%</span>
+                      <span className="text-[#334155]">{s}:</span>
+                      <span className="font-bold text-[#10B981]">{(Number(w) * 100).toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Min Variance */}
-              <div className="p-4 bg-[#0B0F1A] rounded-xl border border-[#1F2937]">
-                <div className="flex items-center justify-between text-xs font-bold text-[#dde2f6] mb-2 font-sans">
+              <div className="p-4 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                <div className="flex items-center justify-between text-xs font-bold text-[#0F172A] mb-2 font-sans">
                   <span className="label-caps">MINIMUM VARIANCE</span>
-                  <Shield className="w-4 h-4 text-[#22C55E]" />
+                  <Shield className="w-4 h-4 text-[#10B981]" />
                 </div>
-                <div className="text-xs text-[#9CA3AF] space-y-1 font-mono">
-                  <div>Expected Return: <strong className="text-[#22C55E]">{(Number(optResult.min_variance.expected_return) * 100).toFixed(2)}%</strong></div>
-                  <div>Annual Volatility: <strong className="text-white">{(Number(optResult.min_variance.volatility) * 100).toFixed(2)}%</strong></div>
-                  <div>Sharpe Ratio: <strong className="text-[#dde2f6]">{Number(optResult.min_variance.sharpe_ratio).toFixed(2)}</strong></div>
+                <div className="text-xs text-[#64748B] space-y-1 font-mono">
+                  <div>Expected Return: <strong className="text-[#10B981]">{(Number(optResult.min_variance.expected_return) * 100).toFixed(2)}%</strong></div>
+                  <div>Annual Volatility: <strong className="text-[#0F172A]">{(Number(optResult.min_variance.volatility) * 100).toFixed(2)}%</strong></div>
+                  <div>Sharpe Ratio: <strong className="text-[#0F172A] font-bold">{Number(optResult.min_variance.sharpe_ratio).toFixed(2)}</strong></div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-[#1F2937] space-y-1 text-xs">
-                  <div className="label-caps text-[#9CA3AF]">Optimal Weights:</div>
+                <div className="mt-3 pt-3 border-t border-[#E2E8F0] space-y-1 text-xs">
+                  <div className="label-caps text-[#64748B]">Optimal Weights:</div>
                   {Object.entries(optResult.min_variance.weights).map(([s, w]) => (
                     <div key={s} className="flex justify-between text-[11px] font-mono">
-                      <span className="text-[#dde2f6]">{s}:</span>
-                      <span className="font-bold text-white">{(Number(w) * 100).toFixed(1)}%</span>
+                      <span className="text-[#334155]">{s}:</span>
+                      <span className="font-bold text-[#0F172A]">{(Number(w) * 100).toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Risk Parity */}
-              <div className="p-4 bg-[#0B0F1A] rounded-xl border border-[#1F2937]">
-                <div className="flex items-center justify-between text-xs font-bold text-[#dde2f6] mb-2 font-sans">
+              <div className="p-4 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                <div className="flex items-center justify-between text-xs font-bold text-[#0F172A] mb-2 font-sans">
                   <span className="label-caps">EQUAL RISK CONTRIBUTION</span>
                   <Activity className="w-4 h-4 text-[#8B5CF6]" />
                 </div>
-                <div className="text-xs text-[#9CA3AF] space-y-1 font-mono">
-                  <div>Expected Return: <strong className="text-[#22C55E]">{(Number(optResult.risk_parity.expected_return) * 100).toFixed(2)}%</strong></div>
-                  <div>Annual Volatility: <strong className="text-white">{(Number(optResult.risk_parity.volatility) * 100).toFixed(2)}%</strong></div>
-                  <div>Sharpe Ratio: <strong className="text-[#dde2f6]">{Number(optResult.risk_parity.sharpe_ratio).toFixed(2)}</strong></div>
+                <div className="text-xs text-[#64748B] space-y-1 font-mono">
+                  <div>Expected Return: <strong className="text-[#10B981]">{(Number(optResult.risk_parity.expected_return) * 100).toFixed(2)}%</strong></div>
+                  <div>Annual Volatility: <strong className="text-[#0F172A]">{(Number(optResult.risk_parity.volatility) * 100).toFixed(2)}%</strong></div>
+                  <div>Sharpe Ratio: <strong className="text-[#0F172A] font-bold">{Number(optResult.risk_parity.sharpe_ratio).toFixed(2)}</strong></div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-[#1F2937] space-y-1 text-xs">
-                  <div className="label-caps text-[#9CA3AF]">Parity Weights:</div>
+                <div className="mt-3 pt-3 border-t border-[#E2E8F0] space-y-1 text-xs">
+                  <div className="label-caps text-[#64748B]">Parity Weights:</div>
                   {Object.entries(optResult.risk_parity.weights).map(([s, w]) => (
                     <div key={s} className="flex justify-between text-[11px] font-mono">
-                      <span className="text-[#dde2f6]">{s}:</span>
-                      <span className="font-bold text-white">{(Number(w) * 100).toFixed(1)}%</span>
+                      <span className="text-[#334155]">{s}:</span>
+                      <span className="font-bold text-[#0F172A]">{(Number(w) * 100).toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
@@ -454,17 +457,17 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
             </div>
 
             {/* Target Rebalance Tool */}
-            <div className="p-5 bg-[#0B0F1A] rounded-xl border border-[#1F2937]">
+            <div className="p-5 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-white flex items-center gap-1.5 font-sans">
-                  <SlidersHorizontal className="w-4 h-4 text-[#3B82F6]" />
+                <h4 className="text-xs font-bold text-[#0F172A] flex items-center gap-1.5 font-sans">
+                  <SlidersHorizontal className="w-4 h-4 text-[#0284C7]" />
                   Target Portfolio Rebalance & Order Delta Engine
                 </h4>
                 <button
                   type="button"
                   onClick={handleCalculateRebalance}
                   disabled={rebLoading}
-                  className="px-3 py-1.5 rounded-lg bg-[#22C55E] hover:bg-[#16a34a] text-[#0B0F1A] font-extrabold text-xs transition shadow-md shadow-[#22C55E]/20 cursor-pointer active:scale-98"
+                  className="btn-buy-primary px-3.5 py-1.5 text-xs cursor-pointer active:scale-98"
                 >
                   {rebLoading ? 'Calculating...' : 'Generate Rebalance Orders'}
                 </button>
@@ -472,8 +475,8 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
 
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
                 {optSymbols.map((sym) => (
-                  <div key={sym} className="p-2.5 bg-[#121826] rounded-lg border border-[#1F2937]">
-                    <label className="block text-[11px] font-bold text-[#dde2f6] font-mono">{sym} Target %</label>
+                  <div key={sym} className="p-2.5 bg-white rounded-xl border border-[#E2E8F0]">
+                    <label className="block text-[11px] font-bold text-[#334155] font-mono">{sym} Target %</label>
                     <input
                       type="number"
                       min="0"
@@ -482,17 +485,17 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                       onChange={(e) =>
                         setTargetWeights({ ...targetWeights, [sym]: Number(e.target.value) })
                       }
-                      className="w-full mt-1 px-2 py-1 bg-[#0B0F1A] border border-[#1F2937] rounded text-xs text-white font-mono focus:border-[#3B82F6]"
+                      className="w-full mt-1 px-2.5 py-1 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] font-mono focus:border-[#0284C7] focus:bg-white"
                     />
                   </div>
                 ))}
               </div>
 
               {rebalancePlan && (
-                <div className="mt-4 border-t border-[#1F2937] pt-4 overflow-x-auto">
+                <div className="mt-4 border-t border-[#E2E8F0] pt-4 overflow-x-auto">
                   <table className="w-full text-xs text-left font-mono">
                     <thead>
-                      <tr className="text-[#9CA3AF] border-b border-[#1F2937] label-caps">
+                      <tr className="text-[#64748B] border-b border-[#E2E8F0] label-caps">
                         <th className="pb-2">Asset</th>
                         <th className="pb-2">Action</th>
                         <th className="pb-2">Current Qty</th>
@@ -503,31 +506,31 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                         <th className="pb-2 text-right">Target Wt</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#1F2937]">
+                    <tbody className="divide-y divide-[#E2E8F0]">
                       {rebalancePlan.actions.map((act: any) => (
-                        <tr key={act.symbol} className="h-9 hover:bg-[#161F33]/40">
-                          <td className="py-2 font-bold text-white">{act.symbol}</td>
+                        <tr key={act.symbol} className="h-9 hover:bg-white">
+                          <td className="py-2 font-bold text-[#0F172A]">{act.symbol}</td>
                           <td className="py-2">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 act.action === 'BUY'
-                                  ? 'bg-[#22C55E]/15 text-[#22C55E]'
+                                  ? 'bg-[#10B981]/10 text-[#047857] border border-[#10B981]/30'
                                   : act.action === 'SELL'
-                                  ? 'bg-[#EF4444]/15 text-[#EF4444]'
-                                  : 'bg-[#1F2937] text-[#9CA3AF]'
+                                  ? 'bg-[#F43F5E]/10 text-[#BE123C] border border-[#F43F5E]/30'
+                                  : 'bg-[#F1F5F9] text-[#64748B]'
                               }`}
                             >
                               {act.action}
                             </span>
                           </td>
-                          <td className="py-2 text-[#dde2f6]">{Number(act.current_quantity).toFixed(0)}</td>
-                          <td className="py-2 text-[#dde2f6]">{Number(act.target_quantity).toFixed(0)}</td>
-                          <td className="py-2 font-bold text-white">
+                          <td className="py-2 text-[#334155]">{Number(act.current_quantity).toFixed(0)}</td>
+                          <td className="py-2 text-[#334155]">{Number(act.target_quantity).toFixed(0)}</td>
+                          <td className="py-2 font-bold text-[#0F172A]">
                             {Number(act.quantity_delta) > 0 ? `+${Number(act.quantity_delta).toFixed(0)}` : Number(act.quantity_delta).toFixed(0)}
                           </td>
-                          <td className="py-2 text-[#dde2f6]">₹{Number(act.estimated_cost).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                          <td className="py-2 text-[#9CA3AF]">{Number(act.current_weight_pct).toFixed(1)}%</td>
-                          <td className="py-2 text-right font-bold text-[#22C55E]">{Number(act.target_weight_pct).toFixed(1)}%</td>
+                          <td className="py-2 text-[#334155]">₹{Number(act.estimated_cost).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                          <td className="py-2 text-[#64748B]">{Number(act.current_weight_pct).toFixed(1)}%</td>
+                          <td className="py-2 text-right font-bold text-[#10B981]">{Number(act.target_weight_pct).toFixed(1)}%</td>
                         </tr>
                       ))}
                     </tbody>
@@ -541,38 +544,38 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
 
       {/* New Portfolio Modal - Level 2 Overlay */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="card-level-2 w-full max-w-md p-6 bg-[#161F33] border border-[#374151] rounded-2xl relative shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="card-level-2 w-full max-w-md p-6 bg-white border border-[#E2E8F0] rounded-2xl relative shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-white font-sans">Initialize New Investment Book</h3>
+              <h3 className="text-base font-bold text-[#0F172A] font-sans">Initialize New Investment Book</h3>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-1 text-[#9CA3AF] hover:text-white rounded cursor-pointer"
+                className="p-1 text-[#64748B] hover:text-[#0F172A] rounded-lg cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleCreatePortfolio} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#9CA3AF] mb-1 font-sans">Book Name</label>
+                <label className="block text-xs font-semibold text-[#475569] mb-1 font-sans">Book Name</label>
                 <input
                   type="text"
                   required
                   value={newPortName}
                   onChange={(e) => setNewPortName(e.target.value)}
-                  placeholder="e.g. Dividend Factor Portfolio"
-                  className="w-full px-3 py-2 bg-[#0B0F1A] border border-[#1F2937] rounded-lg text-sm text-white focus:border-[#3B82F6]"
+                  placeholder="e.g. Portfolix Momentum Book"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:border-[#0284C7] focus:bg-white"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#9CA3AF] mb-1 font-sans">Initial Paper Allocation (₹)</label>
+                <label className="block text-xs font-semibold text-[#475569] mb-1 font-sans">Initial Capital Allocation (₹)</label>
                 <input
                   type="number"
                   required
                   value={newPortCash}
                   onChange={(e) => setNewPortCash(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#0B0F1A] border border-[#1F2937] rounded-lg text-sm text-white font-mono focus:border-[#3B82F6]"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] font-mono focus:border-[#0284C7] focus:bg-white"
                 />
               </div>
               <div className="flex gap-2 justify-end pt-2">
@@ -585,7 +588,7 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-[#22C55E] hover:bg-[#16a34a] text-[#0B0F1A] font-extrabold text-xs cursor-pointer active:scale-98"
+                  className="btn-buy-primary px-4 py-2 text-xs cursor-pointer active:scale-98"
                 >
                   Create Book
                 </button>
@@ -597,30 +600,30 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
 
       {/* Cash Modal - Level 2 Overlay */}
       {showCashModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="card-level-2 w-full max-w-md p-6 bg-[#161F33] border border-[#374151] rounded-2xl relative shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="card-level-2 w-full max-w-md p-6 bg-white border border-[#E2E8F0] rounded-2xl relative shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-white font-sans">
+              <h3 className="text-base font-bold text-[#0F172A] font-sans">
                 {isDeposit ? 'Deposit Simulated Capital' : 'Withdraw Capital'}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowCashModal(false)}
-                className="p-1 text-[#9CA3AF] hover:text-white rounded cursor-pointer"
+                className="p-1 text-[#64748B] hover:text-[#0F172A] rounded-lg cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleCashAction} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#9CA3AF] mb-1 font-sans">Amount (₹)</label>
+                <label className="block text-xs font-semibold text-[#475569] mb-1 font-sans">Amount (₹)</label>
                 <input
                   type="number"
                   required
                   min="1"
                   value={cashAmount}
                   onChange={(e) => setCashAmount(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#0B0F1A] border border-[#1F2937] rounded-lg text-sm text-white font-mono focus:border-[#3B82F6]"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] font-mono focus:border-[#0284C7] focus:bg-white"
                 />
               </div>
               <div className="flex gap-2 justify-end pt-2">
@@ -633,7 +636,7 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-[#22C55E] hover:bg-[#16a34a] text-[#0B0F1A] font-extrabold text-xs cursor-pointer active:scale-98"
+                  className="btn-buy-primary px-4 py-2 text-xs cursor-pointer active:scale-98"
                 >
                   Confirm {isDeposit ? 'Deposit' : 'Withdrawal'}
                 </button>

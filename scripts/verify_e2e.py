@@ -20,9 +20,22 @@ def run_e2e_verification():
 
     # 2. Frontend HTTP status
     print("\n[2/8] Verifying Frontend Dev Server...")
-    f_res = client.get(FRONTEND_BASE)
+    f_res = None
+    target_frontend = FRONTEND_BASE
+    for test_url in [FRONTEND_BASE, "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174"]:
+        try:
+            res = client.get(test_url)
+            if res.status_code == 200:
+                f_res = res
+                target_frontend = test_url
+                break
+        except Exception:
+            continue
+
+    if f_res is None:
+        f_res = client.get(FRONTEND_BASE)
     assert f_res.status_code == 200, f"Frontend check failed: {f_res.status_code}"
-    print(f"  [PASS] Frontend server responding at {FRONTEND_BASE} (HTTP 200)")
+    print(f"  [PASS] Frontend server responding at {target_frontend} (HTTP 200)")
 
     # 3. Authentication & Login
     print("\n[3/8] Authenticating Demo Trader Account...")
@@ -52,8 +65,10 @@ def run_e2e_verification():
     # 5. Paper Trading Execution
     print("\n[5/8] Testing ACID Paper Trading Execution...")
     ports_res = client.get(f"{API_BASE}/portfolios", headers=headers)
-    assert len(ports_res.json()) > 0
-    portfolio = ports_res.json()[0]
+    ports = ports_res.json()
+    assert len(ports) > 0, "No portfolios found for demo trader account"
+    # Select first portfolio or one with available funds
+    portfolio = next((p for p in ports if float(p.get("cash_balance", 0)) >= 50000), ports[0])
     p_id = portfolio["id"]
 
     # Preview Order
@@ -70,6 +85,14 @@ def run_e2e_verification():
     est_total = float(prev_data['estimated_total'])
     print(f"  [PASS] Order Preview: Buy 25 INFY, Est Price: Rs.{est_price:.2f}, Est Total: Rs.{est_total:.2f}")
 
+    # Ensure portfolio has enough cash to fill the order
+    if float(portfolio.get("cash_balance", 0)) < est_total * 1.05:
+        deposit_res = client.post(f"{API_BASE}/portfolios/{p_id}/deposit", json={
+            "amount": 500000.0,
+            "notes": "E2E automated test funding"
+        }, headers=headers)
+        assert deposit_res.status_code == 200, f"Failed depositing test funds: {deposit_res.text}"
+
     # Execute Order
     order_res = client.post(f"{API_BASE}/orders", json={
         "symbol": "INFY",
@@ -78,9 +101,10 @@ def run_e2e_verification():
         "quantity": 25,
         "order_type": "MARKET"
     }, headers=headers)
-    assert order_res.status_code == 201
-    assert order_res.json()["status"] == "FILLED"
-    print(f"  [PASS] Order FILLED: Trade ID #{order_res.json()['id']} executed atomically.")
+    assert order_res.status_code == 201, f"Order creation failed: {order_res.text}"
+    order_data = order_res.json()
+    assert order_data["status"] == "FILLED", f"Expected FILLED but got {order_data.get('status')}: {order_data.get('reject_reason')}"
+    print(f"  [PASS] Order FILLED: Trade ID #{order_data['id']} executed atomically.")
 
     # 6. Portfolio Analytics & Markowitz MPT Optimization
     print("\n[6/8] Testing Portfolio Risk Analytics & Markowitz Optimization...")
