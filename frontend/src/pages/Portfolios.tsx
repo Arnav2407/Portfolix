@@ -11,7 +11,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react';
-import api from '../api/client';
+import api, { API_BASE_URL } from '../api/client';
 import {
   Portfolio,
   PortfolioPerformance,
@@ -138,7 +138,7 @@ export const Portfolios: React.FC<PortfoliosProps> = ({
 
   const handleExportCSV = () => {
     if (!activePortfolio) return;
-    window.open(`/api/v1/reports/portfolio/${activePortfolio.id}/csv`, '_blank');
+    window.open(`${API_BASE_URL}/reports/portfolio/${activePortfolio.id}/csv`, '_blank');
   };
 
   return (

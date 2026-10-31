@@ -6,6 +6,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { Portfolio } from '../types';
+import { API_BASE_URL } from '../api/client';
 
 interface ReportsProps {
   portfolio: Portfolio | null;
@@ -14,11 +15,11 @@ interface ReportsProps {
 export const Reports: React.FC<ReportsProps> = ({ portfolio }) => {
   const handleDownloadPortfolioCSV = () => {
     if (!portfolio) return;
-    window.open(`/api/v1/reports/portfolio/${portfolio.id}/csv`, '_blank');
+    window.open(`${API_BASE_URL}/reports/portfolio/${portfolio.id}/csv`, '_blank');
   };
 
   const handleDownloadTradesCSV = () => {
-    window.open('/api/v1/reports/trades/csv', '_blank');
+    window.open(`${API_BASE_URL}/reports/trades/csv`, '_blank');
   };
 
   return (
