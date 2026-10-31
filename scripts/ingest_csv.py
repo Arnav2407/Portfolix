@@ -160,7 +160,7 @@ NSE_EQUITY_METADATA = {
     }
 }
 
-def locate_csv_file() -> Path:
+def locate_csv_file():
     candidates = [
         PROJECT_ROOT / "data" / "processed" / "cleaned_stock_data.csv",
         PROJECT_ROOT / "cleaned_stock_data.csv",
@@ -169,7 +169,7 @@ def locate_csv_file() -> Path:
     for p in candidates:
         if p.exists():
             return p
-    raise FileNotFoundError(f"Could not locate stock data CSV in candidates: {candidates}")
+    return None
 
 def run_ingestion(csv_path: Path = None, batch_size: int = 5000):
     start_time = time.time()
@@ -184,124 +184,134 @@ def run_ingestion(csv_path: Path = None, batch_size: int = 5000):
 
     if csv_path is None:
         csv_path = locate_csv_file()
-    print(f"Reading data source from: {csv_path}")
 
-    # 2. Read dataset
-    df = pd.read_csv(csv_path)
-    total_raw_rows = len(df)
-    print(f"Loaded {total_raw_rows:,} raw records from CSV")
+    if csv_path is None or not Path(csv_path).exists():
+        print("⚠️  Warning: Stock dataset CSV not found in repository.")
+        print("   Skipping historical price loading. Database schema and seed users will still be initialized.")
+        valid_records = []
+        skipped_anomalies = []
+        zero_vol_count = 0
+        total_raw_rows = 0
+        inserted_count = 0
+    else:
+        print(f"Reading data source from: {csv_path}")
 
-    # 3. Populate / Sync Symbols
-    print("\n[2/5] Synchronizing Symbol Universe & Sectors...")
-    unique_tickers = df["Symbol"].dropna().unique().tolist()
-    symbol_map = {} # ticker -> Symbol model
+        # 2. Read dataset
+        df = pd.read_csv(csv_path)
+        total_raw_rows = len(df)
+        print(f"Loaded {total_raw_rows:,} raw records from CSV")
 
-    for ticker in unique_tickers:
-        ticker_str = str(ticker).strip().upper()
-        meta = NSE_EQUITY_METADATA.get(ticker_str, {
-            "name": f"{ticker_str} India Ltd",
-            "sector": "Diversified",
-            "industry": "General",
-            "exchange": "NSE",
-            "currency": "INR"
-        })
-        symbol = db.query(Symbol).filter(Symbol.ticker == ticker_str).first()
-        if not symbol:
-            symbol = Symbol(
-                ticker=ticker_str,
-                name=meta["name"],
-                sector=meta["sector"],
-                industry=meta["industry"],
-                exchange=meta["exchange"],
-                currency=meta["currency"],
-                is_active=True
-            )
-            db.add(symbol)
-            db.flush()
-        else:
-            # Update metadata if exists
-            symbol.name = meta["name"]
-            symbol.sector = meta["sector"]
-            symbol.industry = meta["industry"]
-        symbol_map[ticker_str] = symbol
+        # 3. Populate / Sync Symbols
+        print("\n[2/5] Synchronizing Symbol Universe & Sectors...")
+        unique_tickers = df["Symbol"].dropna().unique().tolist()
+        symbol_map = {} # ticker -> Symbol model
 
-    db.commit()
-    print(f"Verified {len(symbol_map)} symbols in database.")
-
-    # 4. Validate and Process Price Records
-    print("\n[3/5] Validating Price Records via Pydantic & Cleaning...")
-    valid_records = []
-    skipped_anomalies = []
-    zero_vol_count = 0
-
-    for idx, row in df.iterrows():
-        try:
-            # Check for NaN prices first
-            if pd.isna(row.get("Open")) or pd.isna(row.get("High")) or pd.isna(row.get("Low")) or pd.isna(row.get("Close")):
-                skipped_anomalies.append(f"Row {idx}: Symbol={row.get('Symbol')} Date={row.get('Date')} has NaN prices.")
-                continue
-
-            parsed_date = pd.to_datetime(row["Date"]).date()
-            symbol_str = str(row["Symbol"]).strip().upper()
-
-            # Pydantic schema validation
-            validated = PriceValidationSchema(
-                Date=parsed_date,
-                Symbol=symbol_str,
-                Open=float(row["Open"]),
-                High=float(row["High"]),
-                Low=float(row["Low"]),
-                Close=float(row["Close"]),
-                Volume=int(row["Volume"]) if not pd.isna(row.get("Volume")) else 0
-            )
-
-            if validated.Volume == 0:
-                zero_vol_count += 1
-
-            sym = symbol_map.get(symbol_str)
-            if not sym:
-                continue
-
-            valid_records.append({
-                "symbol_id": sym.id,
-                "date": validated.Date,
-                "open": round(Decimal(str(validated.Open)), 4),
-                "high": round(Decimal(str(validated.High)), 4),
-                "low": round(Decimal(str(validated.Low)), 4),
-                "close": round(Decimal(str(validated.Close)), 4),
-                "volume": validated.Volume
+        for ticker in unique_tickers:
+            ticker_str = str(ticker).strip().upper()
+            meta = NSE_EQUITY_METADATA.get(ticker_str, {
+                "name": f"{ticker_str} India Ltd",
+                "sector": "Diversified",
+                "industry": "General",
+                "exchange": "NSE",
+                "currency": "INR"
             })
-        except (ValidationError, Exception) as e:
-            skipped_anomalies.append(f"Row {idx} Symbol={row.get('Symbol')} Date={row.get('Date')} validation error: {str(e)}")
+            symbol = db.query(Symbol).filter(Symbol.ticker == ticker_str).first()
+            if not symbol:
+                symbol = Symbol(
+                    ticker=ticker_str,
+                    name=meta["name"],
+                    sector=meta["sector"],
+                    industry=meta["industry"],
+                    exchange=meta["exchange"],
+                    currency=meta["currency"],
+                    is_active=True
+                )
+                db.add(symbol)
+                db.flush()
+            else:
+                # Update metadata if exists
+                symbol.name = meta["name"]
+                symbol.sector = meta["sector"]
+                symbol.industry = meta["industry"]
+            symbol_map[ticker_str] = symbol
 
-    print(f"Validation summary: {len(valid_records):,} valid records, {len(skipped_anomalies)} anomalies skipped.")
+        db.commit()
+        print(f"Verified {len(symbol_map)} symbols in database.")
 
-    # 5. Idempotent Ingestion using Batch Loading
-    print("\n[4/5] Ingesting Price Records (Idempotent)...")
-    # Check existing (symbol_id, date) pairs to guarantee true idempotency
-    existing_pairs = set(
-        db.query(Price.symbol_id, Price.date).all()
-    )
-    print(f"Found {len(existing_pairs):,} existing price records in database.")
+        # 4. Validate and Process Price Records
+        print("\n[3/5] Validating Price Records via Pydantic & Cleaning...")
+        valid_records = []
+        skipped_anomalies = []
+        zero_vol_count = 0
 
-    to_insert = []
-    for rec in valid_records:
-        pair = (rec["symbol_id"], rec["date"])
-        if pair not in existing_pairs:
-            to_insert.append(rec)
-            existing_pairs.add(pair)
+        for idx, row in df.iterrows():
+            try:
+                # Check for NaN prices first
+                if pd.isna(row.get("Open")) or pd.isna(row.get("High")) or pd.isna(row.get("Low")) or pd.isna(row.get("Close")):
+                    skipped_anomalies.append(f"Row {idx}: Symbol={row.get('Symbol')} Date={row.get('Date')} has NaN prices.")
+                    continue
 
-    print(f"Records to insert: {len(to_insert):,}")
+                parsed_date = pd.to_datetime(row["Date"]).date()
+                symbol_str = str(row["Symbol"]).strip().upper()
 
-    # Perform batch insert
-    inserted_count = 0
-    if to_insert:
-        for i in range(0, len(to_insert), batch_size):
-            batch = to_insert[i:i + batch_size]
-            db.bulk_insert_mappings(Price, batch)
-            db.commit()
-            inserted_count += len(batch)
-            print(f"  Inserted {inserted_count:,} / {len(to_insert):,} records...")
+                # Pydantic schema validation
+                validated = PriceValidationSchema(
+                    Date=parsed_date,
+                    Symbol=symbol_str,
+                    Open=float(row["Open"]),
+                    High=float(row["High"]),
+                    Low=float(row["Low"]),
+                    Close=float(row["Close"]),
+                    Volume=int(row["Volume"]) if not pd.isna(row.get("Volume")) else 0
+                )
+
+                if validated.Volume == 0:
+                    zero_vol_count += 1
+
+                sym = symbol_map.get(symbol_str)
+                if not sym:
+                    continue
+
+                valid_records.append({
+                    "symbol_id": sym.id,
+                    "date": validated.Date,
+                    "open": round(Decimal(str(validated.Open)), 4),
+                    "high": round(Decimal(str(validated.High)), 4),
+                    "low": round(Decimal(str(validated.Low)), 4),
+                    "close": round(Decimal(str(validated.Close)), 4),
+                    "volume": validated.Volume
+                })
+            except (ValidationError, Exception) as e:
+                skipped_anomalies.append(f"Row {idx} Symbol={row.get('Symbol')} Date={row.get('Date')} validation error: {str(e)}")
+
+        print(f"Validation summary: {len(valid_records):,} valid records, {len(skipped_anomalies)} anomalies skipped.")
+
+        # 5. Idempotent Ingestion using Batch Loading
+        print("\n[4/5] Ingesting Price Records (Idempotent)...")
+        # Check existing (symbol_id, date) pairs to guarantee true idempotency
+        existing_pairs = set(
+            db.query(Price.symbol_id, Price.date).all()
+        )
+        print(f"Found {len(existing_pairs):,} existing price records in database.")
+
+        to_insert = []
+        for rec in valid_records:
+            pair = (rec["symbol_id"], rec["date"])
+            if pair not in existing_pairs:
+                to_insert.append(rec)
+                existing_pairs.add(pair)
+
+        print(f"Records to insert: {len(to_insert):,}")
+
+        # Perform batch insert
+        inserted_count = 0
+        if to_insert:
+            for i in range(0, len(to_insert), batch_size):
+                batch = to_insert[i:i + batch_size]
+                db.bulk_insert_mappings(Price, batch)
+                db.commit()
+                inserted_count += len(batch)
+                print(f"  Inserted {inserted_count:,} / {len(to_insert):,} records...")
 
     # 6. Ensure default seed users & demo portfolio
     print("\n[5/5] Ensuring Default Users and Demo Portfolios...")

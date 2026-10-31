@@ -1,0 +1,53 @@
+# ==============================================================================
+# Portfolix — Render Blueprint Specification (Infrastructure-as-Code)
+# ==============================================================================
+# This blueprint defines:
+#   1. Portfolix FastAPI Backend (Python Web Service)
+#   2. Portfolix React Frontend (Static Site with SPA client routing)
+#
+# Deploy via Render Dashboard -> "Blueprints" -> "New Blueprint Instance"
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Backend Web Service (FastAPI + Trading Engine + Analytics)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: portfolix-backend
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python scripts/ingest_csv.py && uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///./portfolix.db
+      - key: BACKEND_CORS_ORIGINS
+        value: '["*"]'
+
+  # ----------------------------------------------------------------------------
+  # 2. Frontend Static Site (React 19 + TypeScript + Vite + Tailwind v4)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: portfolix-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false # Set to https://<your-backend-name>.onrender.com after backend spins up
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+

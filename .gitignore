@@ -72,3 +72,4 @@ pnpm-debug.log*
 Thumbs.db
 data/*.csv
 data/processed/*.csv
+!data/processed/cleaned_stock_data.csv

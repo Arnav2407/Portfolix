@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// Base API URL supports Render/Vercel environment variables or defaults to relative proxy (/api/v1)
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${(import.meta.env.VITE_API_BASE_URL as string).replace(/\/+$/, '')}/api/v1`
+  : '/api/v1';
+
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,7 +31,7 @@ api.interceptors.response.use(
       const refreshToken = localStorage.getItem('portfolix_refresh_token');
       if (refreshToken) {
         try {
-          const res = await axios.post('/api/v1/auth/refresh', { refresh_token: refreshToken });
+          const res = await axios.post(`${API_BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
           const { access_token, refresh_token } = res.data;
           localStorage.setItem('portfolix_access_token', access_token);
           localStorage.setItem('portfolix_refresh_token', refresh_token);
